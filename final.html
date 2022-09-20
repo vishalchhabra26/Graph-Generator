@@ -1,0 +1,386 @@
+<!DOCTYPE>
+
+<html>
+
+	<head>
+		<title>cytoscape-context-menus.js demo</title>
+
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+        <link href="css/cytoscape-context-menus.css" rel="stylesheet" type="text/css" />
+        
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+		<script src="js/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>        
+        <script src="js/jquery-2.0.3.min.js"></script>
+		
+		<script src="js/cytoscape.min.js"></script>
+
+
+		<script src="js/shim.min.js"></script>
+
+		<script src="js/layout-base.js"></script>
+		<script src="js/avsdf-base.js"></script>
+		<script src="cytoscape-avsdf.js"></script>
+		<script src="js/jscolor.js"></script>
+		<script src="js/cytoscape-context-menus.js"></script>
+
+		<script src="js/jquery.js"> </script>
+		<script lang="javascript" src="js/xlsx.full.min.js"></script>
+
+		<style>
+			body {
+				font-family: helvetica neue, helvetica, liberation sans, arial, sans-serif;
+				font-size: 14px;
+			}
+
+			#cy {
+				  height: 92%;
+				  width: 100%;
+				  background-color: #cccccc;
+				  	
+				}
+			.navbar{
+			   margin-bottom: 0!important;
+			}
+		</style>
+
+		<script>
+			$(document).ready(function() {
+
+ 					 $(window).keydown(function(event){
+
+    					if(event.keyCode == 116) {
+
+      					event.preventDefault();
+
+      					return false;
+
+				    }
+
+				  });
+
+				});
+			
+
+      document.addEventListener('DOMContentLoaded', function(){
+
+				var cy = window.cy = cytoscape({
+					container: document.getElementById('cy'),
+
+					style: [
+						{
+							selector: 'node',
+							style: {
+								'content': 'data(name)',
+								'text-halign':'center',
+								'text-valign':'center',
+							}
+						},
+
+						{
+							selector: 'edge',
+							style: {
+								'curve-style': 'bezier',
+								'target-arrow-shape': 'triangle'
+								}
+						},
+
+						{
+							selector: ':selected',
+							style: {
+
+							}
+						}
+						
+          ],
+          layout: {
+						name: 'breadthfirst'
+					},
+				});
+                                
+                var selectAllOfTheSameType = function(ele) {
+                                    cy.elements().unselect();
+                                    if(ele.isNode()) {
+                                        cy.nodes().select();
+                                    }
+                                    else if(ele.isEdge()) {
+                                        cy.edges().select();
+                                    }
+                                };
+
+				// demo your core ext
+				cy.contextMenus({
+                                    menuItems: [
+                                        {
+                                            id: 'remove',
+                                            content: 'remove',
+                                            tooltipText: 'remove',
+                                            image: {src : "remove.svg", width : 12, height : 12, x : 6, y : 4},
+                                            selector: 'node, edge',
+                                            onClickFunction: function (event) {
+                                              var target = event.target || event.cyTarget;
+                                              target.remove();
+                                            },
+                                            hasTrailingDivider: true
+                                          },
+                                          
+                                          {
+                                            id: 'changecolor',
+                                            content: 'changecolor',
+                                            tooltipText: 'color',
+                                            selector: 'node,edge',
+                                            onClickFunction: function (event) {
+
+                      											var temp1=document.getElementById("foo");
+                      											temp1.mousedown;
+                      											temp=temp1.value;
+                      											temp="#"+temp;
+                      											                      
+																var target = event.target || event.cyTarget;
+                      											if (target.isEdge()) {
+                      											    target.style('line-color', temp);
+                      											  } else {
+                      											    target.style({
+                      											      'background-color': temp,
+                      											    });
+                      											  }                                                                                   
+                                            },
+                                            
+                                          },
+                                          {
+                                            id: 'add-node',
+                                            content: 'add node',
+                                            tooltipText: 'add node',
+                                            image: {src : "add.svg", width : 12, height : 12, x : 6, y : 4},
+                                            coreAsWell: true,
+                                            onClickFunction: function (event) {
+                                              var gh = document.getElementsByName('optradio');
+                                              var mycolorr='#0';  
+											  var s;
+                                              if(gh[0].checked)
+                                              {
+
+                                                mycolorr='#A0A0A0';
+                                              }
+                                              else
+                                              {
+                                                s='square';
+												mycolorr='#A0103E';
+                                              }
+                                              var person = prompt("Enter Name of the Node");
+                                              if(person!=null)
+                                              {	
+                                              var data = {
+                                                  group: 'nodes',
+                                           		  id: person,
+                                           		  name:person,
+                                              };
+                                              var pos = event.position || event.cyPosition;
+                                              
+                                              cy.add({
+                                                  data: data,
+                                                  position: {
+                                                      x: pos.x,
+                                                      y: pos.y
+                                                  },
+                                              }).css({ 'shape': s,'background-color': mycolorr }); 
+                                            }
+											}},
+
+											{
+                                            id: 'add-edge',
+                                            content: 'add edge',
+                                            tooltipText: 'add edge',
+                                            image: {src : "add.svg", width : 12, height : 12, x : 6, y : 4},
+                                            coreAsWell: true,
+                                            onClickFunction: function (event) {
+											var gh = document.getElementsByName('optradio');
+                                              var mycolorr='#0';  
+                                              if(gh[0].checked)
+                                              {
+
+                                                mycolorr='#A0A0A0';
+                                              }
+                                              else
+                                              {
+                                                mycolorr='#A0103E';
+                                              }
+                                              var src = prompt("Enter Source Node");
+                                              if(src!=null)
+                                              {	
+                                               var trgt = prompt("Enter Target Node");	
+                                               	if(trgt!=null)
+                                              		{	
+                                              			var data = {
+			                                                  group: 'edges',
+			                                           		  source: src, 
+			                                           		  target: trgt
+			                                        };
+                                              var pos = event.position || event.cyPosition;
+                                              cy.add({
+                                                  data: data,
+                                              }).css({ 'line-color': mycolorr });
+                                            }
+                                      	  }
+                                          }},
+
+
+                                          {
+                                            id: 'remove-selected',
+                                            content: 'remove selected',
+                                            tooltipText: 'remove selected',
+                                            image: {src : "remove.svg", width : 12, height : 12, x : 6, y : 6},
+                                            coreAsWell: true,
+                                            onClickFunction: function (event) {
+                                              cy.$(':selected').remove();
+                                            }
+                                          },
+                                          {
+                                            id: 'select-all-nodes',
+                                            content: 'select all nodes',
+                                            tooltipText: 'select all nodes',
+                                            selector: 'node',
+                                            onClickFunction: function (event) {
+                                              selectAllOfTheSameType(event.target || event.cyTarget);
+                                            }
+                                          },
+                                          {
+                                            id: 'select-all-edges',
+                                            content: 'select all edges',
+                                            tooltipText: 'select all edges',
+                                            selector: 'edge',
+                                            onClickFunction: function (event) {
+                                              selectAllOfTheSameType(event.target || event.cyTarget);
+                                            }
+                                          }
+                                        ]
+                                      });
+
+
+					document.getElementById("randomize").addEventListener("click", function(){
+					cy.nodes().forEach(function(ele){
+						ele.data().weight = Math.floor((Math.random() * 10) + 1);
+					});
+	
+
+					var layout = cy.layout({
+						name: 'circle',
+						animate: true,
+						sort: function(a, b){ return a.data('weight') - b.data('weight') },
+						radius: 250,
+						animationDuration: 1000,
+						animationEasing: 'ease-in-out'
+					});
+					layout.run();
+				});
+				cy.userZoomingEnabled( false );
+
+
+
+			
+      });
+
+// function to save graph in image format
+function ssave()
+{
+var png64 = cy.png();
+document.querySelector('#png-eg').setAttribute('src', png64);
+}
+
+//function to generate graph from file input
+
+$(document).ready(function(){
+var nodedata;
+var edgedata;
+              $("#fileUploader").change(function(evt){
+                    var selectedFile = evt.target.files[0];
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                      var data = event.target.result;
+                      var workbook = XLSX.read(data, {
+                          type: 'binary'
+                      });
+                      workbook.SheetNames.forEach(function(sheetName) {
+						  if(sheetName=="node")
+						   {	
+								var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+								if (XL_row_object.length > 0) {
+                                    var nodedata = JSON.stringify(XL_row_object);
+									alert (nodedata);
+								}
+							}
+							if(sheetName=="edge")
+						   {	
+								var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+								if (XL_row_object.length > 0) {
+                                    var edgedata = JSON.stringify(XL_row_object);
+									alert (edgedata);
+								}
+							}
+                        })
+                    };
+
+                    reader.onerror = function(event) {
+                      console.error("File could not be read! Code " + event.target.error.code);
+                    };
+
+                    reader.readAsBinaryString(selectedFile);
+              });
+        });
+
+
+
+
+
+
+
+
+
+
+
+		</script>
+	</head>
+
+	<body style="background-color: #e5e5e5">
+		
+		<nav class="navbar navbar-inverse">
+		  <div class="container-fluid">
+			<div class="navbar-header">
+			  <a class="navbar-brand">GRAPH GENERATOR</a>
+			</div>
+			<ul class="nav navbar-nav navbar-right">
+			   <li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown">Select GRAPH
+				<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+				  <li><a><input type="radio"  name="optradio" value="g1" checked="true"> GRAPH 1</a></li>
+				  <li><a><input type="radio" name="optradio" value="g2"> GRAPH 2</a></li>
+				</ul>
+			  </li>
+			  <li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown">Select COLOR
+				<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+				  <li><a><input id="foo" type="text" class="jscolor" value="A0A0A0" placeholder="SELECT COLOR"></a></li>
+				</ul>
+			  </li>
+			  <li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown">EXTRAS
+				<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+				  <li><a data-toggle="tooltip" data-placement="auto" title="Places the nodes circularly as a randomly permuted sequence"><button id="randomize" type="button">Randomize</button></a></li>
+				  <li><a><button id="save" type="button" onclick="ssave()" >SAVE GRAPH</button></a></li>
+				  <li><a><input type="file" id="fileUploader" name="fileUploader" accept=".xls, .xlsx"/></a></li>
+				</ul>
+			  </li>
+			</ul>
+		  </div>
+		</nav>
+		<div id="cy"></div>
+		<div style="border:1px solid black">
+			<img id="png-eg" align="middle" title="graph1">
+		</div>	
+	</body>
+
+</html>
